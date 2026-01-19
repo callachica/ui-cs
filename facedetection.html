@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gracewell NEXUS Attendance Scanner</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f1c2e; /* Deep navy blue */
+      color: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .navbar {
+      background-color: #0f1c2e;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      border-bottom: 1px solid #f4c10f;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .profile-icon {
+      background-color: #f4c10f;
+      color: #0f1c2e;
+      font-weight: bold;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .profile-name {
+      font-size: 14px;
+    }
+
+    .dropdown-arrow {
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .main-content {
+      display: flex;
+      flex: 1;
+    }
+
+    .left-panel {
+      flex: 1;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: #0f1c2e;
+    }
+
+    .left-panel h1 {
+      font-size: 36px;
+      margin: 0;
+      color: white;
+    }
+
+    .left-panel h2 {
+      font-size: 24px;
+      color: #f4c10f; /* Bright yellow */
+      margin-top: 10px;
+    }
+
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #0f1c2e;
+      position: relative;
+    }
+
+    .scanner-frame {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      background-color: #1a2a3f; /* Slightly lighter blue for contrast */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+    }
+
+    .scanner-frame i {
+      font-size: 80px;
+      color: #f4c10f;
+    }
+
+    .corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border: 4px solid #f4c10f;
+    }
+
+    .top-left {
+      top: 0;
+      left: 0;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .top-right {
+      top: 0;
+      right: 0;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .bottom-left {
+      bottom: 0;
+      left: 0;
+      border-right: none;
+      border-top: none;
+    }
+
+    .bottom-right {
+      bottom: 0;
+      right: 0;
+      border-left: none;
+      border-top: none;
+    }
+
+    .instruction {
+      margin-top: 30px;
+      font-size: 16px;
+      text-align: center;
+      color: #ccc;
+      cursor: pointer;
+    }
+
+    .scanner-frame {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      background-color: #1a2a3f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .scanner-frame:hover {
+      box-shadow: 0 0 20px rgba(244, 193, 15, 0.3);
+      transform: scale(1.02);
+    }
+
+    .scanner-frame video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+      border-radius: 10px;
+    }
+
+    .scanner-frame.active video {
+      display: block;
+    }
+
+    .scanner-frame.active i {
+      display: none;
+    }
+
+    .status-text {
+      margin-top: 20px;
+      font-size: 14px;
+      text-align: center;
+      color: #f4c10f;
+      min-height: 20px;
+    }
+
+    /* Confirmation Modal */
+    .confirmation-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #0f1c2e;
+      z-index: 1000;
+      flex-direction: row;
+      height: 100vh;
+    }
+
+    .confirmation-modal.show {
+      display: flex;
+    }
+
+    .confirmation-navbar {
+      display: none;
+    }
+
+    .confirmation-modal-content {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      height: 100%;
+    }
+
+    .modal-left-panel {
+      flex: 1;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: #0f1c2e;
+    }
+
+    .modal-left-panel h2 {
+      margin: 0;
+      font-size: 28px;
+      color: #f4c10f;
+      margin-bottom: 20px;
+    }
+
+    .modal-info {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .modal-info p {
+      margin: 10px 0;
+    }
+
+    .modal-right-panel {
+      flex: 1;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background-color: #1a2a3f;
+      border-left: 2px solid #f4c10f;
+    }
+
+    .modal-checkmark {
+      font-size: 80px;
+      color: #00ff88;
+      margin-bottom: 20px;
+    }
+
+    .modal-message {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: white;
+    }
+
+    .modal-timestamp {
+      font-size: 16px;
+      color: #ccc;
+      margin-top: 20px;
+    }
+
+    .modal-timestamp p {
+      margin: 5px 0;
+    }
+
+    .id-card {
+      display: none;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    /* Navbar styles */
+    .confirmation-navbar {
+      background-color: #0f1c2e;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      border-bottom: 1px solid #f4c10f;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1001;
+    }
+
+    .navbar-logo {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .navbar-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .navbar-profile-icon {
+      background-color: #f4c10f;
+      color: #0f1c2e;
+      font-weight: bold;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .navbar-profile-name {
+      font-size: 14px;
+    }
+
+    .navbar-dropdown-arrow {
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .confirmation-modal-content {
+      display: flex;
+      flex-direction: row;
+      margin-top: 70px;
+      height: calc(100vh - 70px);
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .btn-primary {
+      background-color: #f4c10f;
+      color: #0f1c2e;
+    }
+
+    .btn-primary:hover {
+      background-color: #e0b00d;
+    }
+
+    .btn-secondary {
+      background-color: #666;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: #777;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">Gracewell NEXUS</div>
+    <div class="profile">
+      <div class="profile-icon">JC</div>
+      <div class="profile-name">Joseph Co</div>
+      <div class="dropdown-arrow">&#9662;</div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="left-panel">
+      <h1>Gracewell NEXUS</h1>
+      <h2>Attendance Checker</h2>
+    </div>
+    <div class="right-panel">
+      <div class="scanner-frame" id="scannerFrame">
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+        <i class="fas fa-camera"></i>
+        <video id="cameraVideo"></video>
+      </div>
+      <div class="instruction" id="instruction">Click to start scanning</div>
+      <div class="status-text" id="statusText"></div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="confirmation-modal" id="confirmationModal">
+    <div class="confirmation-modal-content">
+      <div class="modal-left-panel">
+        <h2>Employee Details</h2>
+        <div class="modal-info">
+          <p><strong>Name:</strong> <span id="cardName">John Michael Reyes</span></p>
+          <p><strong>Employee ID:</strong> <span id="cardId">PT0001</span></p>
+          <p><strong>Department:</strong> <span id="cardDept">Operations</span></p>
+          <p><strong>Position:</strong> <span id="cardPos">Porter</span></p>
+        </div>
+      </div>
+      <div class="modal-right-panel">
+        <div class="modal-checkmark">✓</div>
+        <div class="modal-message">Great! You have timed in.</div>
+        <div class="modal-timestamp">
+          <p><strong>Date:</strong> <span id="infoDate">Tuesday, January 20, 2026</span></p>
+          <p><strong>Time-In:</strong> <span id="infoTime">02:55:05 AM</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let cameraActive = false;
+
+    // Simulated employee data
+    const employeeData = {
+      name: 'John Michael Reyes',
+      id: 'PT0001',
+      department: 'Operations',
+      position: 'Porter'
+    };
+
+    const scannerFrame = document.getElementById('scannerFrame');
+    const statusText = document.getElementById('statusText');
+    const confirmationModal = document.getElementById('confirmationModal');
+
+    // Click to start scanning
+    scannerFrame.addEventListener('click', startScanning);
+
+    async function startScanning() {
+      if (cameraActive) {
+        stopCamera();
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user' },
+          audio: false
+        });
+
+        const video = document.getElementById('cameraVideo');
+        video.srcObject = stream;
+        video.play();
+
+        scannerFrame.classList.add('active');
+        cameraActive = true;
+        statusText.textContent = 'Camera active - Scanning...';
+        statusText.style.color = '#f4c10f';
+
+        // Simulate face detection after 3 seconds
+        setTimeout(() => {
+          if (cameraActive) {
+            detectFace();
+          }
+        }, 3000);
+      } catch (error) {
+        statusText.textContent = 'Camera access denied. Please enable permissions.';
+        statusText.style.color = '#ff6b6b';
+        console.error('Camera error:', error);
+      }
+    }
+
+    function stopCamera() {
+      const video = document.getElementById('cameraVideo');
+      if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+      }
+      scannerFrame.classList.remove('active');
+      cameraActive = false;
+      statusText.textContent = '';
+    }
+
+    function detectFace() {
+      statusText.textContent = 'Face detected! Recording...';
+      statusText.style.color = '#00ff88';
+
+      setTimeout(() => {
+        stopCamera();
+        showConfirmation();
+      }, 1500);
+    }
+
+    function showConfirmation() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      const timeStr = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+
+      // Update modal with data
+      document.getElementById('infoDate').textContent = dateStr;
+      document.getElementById('infoTime').textContent = timeStr;
+
+      // Update ID card with employee data
+      document.getElementById('cardName').textContent = employeeData.name;
+      document.getElementById('cardId').textContent = employeeData.id;
+      document.getElementById('cardDept').textContent = employeeData.department;
+      document.getElementById('cardPos').textContent = employeeData.position;
+
+      confirmationModal.classList.add('show');
+    }
+
+    function newScan() {
+      confirmationModal.classList.remove('show');
+      statusText.textContent = '';
+      document.getElementById('instruction').textContent = 'Click to start scanning';
+    }
+
+    function logout() {
+      alert('Logging out...');
+      window.location.href = 'loginpage.html';
+    }
+  </script>

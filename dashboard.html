@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gracewell NEXUS Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f5f5; /* Light gray background */
+      color: #333;
+    }
+
+    .navbar {
+      background-color: #1e3a5f; /* Darker blue */
+      padding: 10px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .navbar .logo {
+      font-weight: bold;
+      color: white;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .logo-icon {
+      font-size: 20px;
+    }
+
+    .navbar .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .nav-links .dashboard-btn {
+      background-color: #f4c10f;
+      color: #000;
+      padding: 8px 22px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .nav-links .dashboard-btn:hover {
+      background-color: #ffda2c;
+    }
+
+    .nav-links .employee-link {
+      color: #f4c10f;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .nav-links .employee-link:hover {
+      opacity: 0.8;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 220px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      z-index: 1;
+      top: 50px;
+      padding: 8px;
+    }
+
+    .dropdown-content a {
+      color: #333;
+      padding: 10px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      background-color: #f9f9f9;
+      margin: 5px 0;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .dropdown-content a:first-child {
+      background-color: #fff3e0;
+      color: #f57c00;
+      border: 1px solid #f4c10f;
+      margin-top: 0;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #f4c10f;
+      color: #000;
+      border-color: #f4c10f;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .navbar .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      margin-left: 30px;
+    }
+
+    .profile-avatar {
+      width: 32px;
+      height: 32px;
+      background-color: #4a90e2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .profile-name {
+      color: white;
+      font-weight: 500;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .welcome {
+      padding: 30px 40px;
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .dashboard {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 20px 40px 40px 40px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      width: 380px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border: 1px solid #e0e0e0;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .card-icon {
+      font-size: 20px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .card p {
+      margin: 10px 0;
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-value {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .highlight {
+      color: #00c853;
+      font-weight: bold;
+    }
+
+    .absentees, .pending-payrolls {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .pending-payrolls ul, .absentees ul {
+      margin: 10px 0 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .pending-payrolls li, .absentees li {
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .absentees li::before {
+      content: '•';
+      margin-right: 8px;
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      width: 380px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border: 1px solid #e0e0e0;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .card-icon {
+      font-size: 20px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .card p {
+      margin: 10px 0;
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-value {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .highlight {
+      color: #00c853; /* Success green */
+      font-weight: bold;
+    }
+
+    .absentees, .pending-payrolls {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .pending-payrolls ul, .absentees ul {
+      margin: 10px 0 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .pending-payrolls li, .absentees li {
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .absentees li::before {
+      content: '•';
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo" onclick="window.location.href='dashboard.html'">
+      <span class="logo-icon">✦</span>
+      Gracewell NEXUS
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="dashboard-btn">Dashboard</a>
+      <div class="employee-link">Employee <span>▼</span></div>
+      <div class="dropdown-content">
+        <a href="attendancemangement.html">Attendance Management</a>
+        <a href="truckingcompany.html">Employee Salary Tracker</a>
+        <a href="employeerecord.html">Employee Records</a>
+      </div>
+    </div>
+    </div>
+    <div class="profile">
+      <div class="profile-avatar">GC</div>
+      <span class="profile-name">Grace Co <span>▼</span></span>
+    </div>
+  </div>
+
+  <div class="dashboard">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">📋</span>
+        <h2>Attendance Tracker</h2>
+      </div>
+      <p><strong>Thursday, October 30, 2025</strong></p>
+      <p>
+        <span>Total Present</span>
+        <span class="card-value highlight">6</span>
+      </p>
+      <div class="absentees">
+        <strong>Absentees:</strong>
+        <ul>
+          <li>Michael Brown</li>
+          <li>James Wilson</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">💰</span>
+        <h2>Salary Tracker</h2>
+      </div>
+      <p><strong>October 16–31, 2025</strong></p>
+      <p>
+        <span>Pending Salaries</span>
+        <span class="card-value">₱180,000</span>
+      </p>
+      <p>
+        <span>Released Salaries</span>
+        <span class="card-value">₱197,000</span>
+      </p>
+      <p>
+        <span>Pending Employees</span>
+        <span class="card-value">4</span>
+      </p>
+      <div class="pending-payrolls">
+        <strong>Pending Payrolls:</strong>
+        <ul>
+          <li><span>Robert Johnson</span><span>₱45,000</span></li>
+          <li><span>Michael Brown</span><span>₱46,000</span></li>
+          <li><span>David Miller</span><span>₱44,000</span></li>
+          <li><span>+ 1 more...</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
